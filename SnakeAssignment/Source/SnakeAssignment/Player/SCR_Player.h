@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SCR_Tail.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "SCR_Player.generated.h"
@@ -18,6 +19,8 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
+	void SetPositions(float DeltaTime);
+	void AddTailSegment();
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -25,15 +28,25 @@ public:
 	int32 playerNumber;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<AActor*> Body;
+	TArray<ASCR_Tail*> Body;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FVector LastPosition;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AActor> TailBlueprint;
+	TSubclassOf<ASCR_Tail> TailBlueprint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Speed = 100;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float timeToResetPosition = 0.5f;
 
 	UPROPERTY(VisibleAnywhere)
 	UFloatingPawnMovement* MovementComponent;
+
+private:
+	
+	float resetPositionTimer = 0;
 
 };

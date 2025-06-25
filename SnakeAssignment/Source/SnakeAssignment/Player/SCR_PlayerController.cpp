@@ -101,7 +101,6 @@ void ASCR_PlayerController::HandleMoveForward(float Value)
 
 	if (Value == 1) dir = EDir::up;
 	else if (Value == -1) dir = EDir::down;
-	//GetPawn()->AddMovementInput(FVector::ForwardVector, Value); 
 }
 
 void ASCR_PlayerController::HandleMoveRight(float Value)
@@ -112,7 +111,6 @@ void ASCR_PlayerController::HandleMoveRight(float Value)
 
 	if (Value == 1) dir = EDir::right;
 	else if (Value == -1) dir = EDir::left;
-	//GetPawn()->AddMovementInput(FVector::RightVector, Value); 
 }
 
 void ASCR_PlayerController::SendMoveForward(float Value)
