@@ -4,12 +4,13 @@ void ASCR_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	const int32 MyID = UGameplayStatics::GetPlayerControllerID(this);
+	
 	if (!GetPawn())
 	{
 		UWorld* World = GetWorld();
 		if (!World) return;
 
-		const int32 MyID = UGameplayStatics::GetPlayerControllerID(this);
 
 		for (TActorIterator<APawn> It(World); It; ++It)
 		{
@@ -20,9 +21,16 @@ void ASCR_PlayerController::BeginPlay()
 			if (FoundPawn->IsA(YourSnakePawnClass))
 			{
 				Possess(FoundPawn);
-				UE_LOG(LogTemp, Warning, TEXT("Player %d possessed pawn: %s"), MyID, *FoundPawn->GetName());
 				break;
 			}
+		}
+	}
+
+	if (ASCR_Player* PlayerPawn = Cast<ASCR_Player>(GetPawn()))
+	{
+		if (PlayerPawn)
+		{
+			PlayerPawn->playerNumber = MyID;
 		}
 	}
 }
@@ -31,6 +39,29 @@ void ASCR_PlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if (!MyPawn && GetPawn()) MyPawn = GetPawn();
+
+	switch (dir)
+	{
+		case EDir::up:
+		GetPawn()->AddMovementInput(FVector::ForwardVector, 1); 
+		break;
+		
+		case EDir::down:
+		GetPawn()->AddMovementInput(FVector::ForwardVector, -1); 
+		break;
+		
+		case EDir::right:
+		GetPawn()->AddMovementInput(FVector::RightVector, 1); 
+		break;
+		
+		case EDir::left:
+		GetPawn()->AddMovementInput(FVector::RightVector, -1); 
+		break;
+		
+		default:
+		
+		break;
+	}
 }
 
 ASCR_PlayerController::ASCR_PlayerController()
@@ -67,8 +98,10 @@ void ASCR_PlayerController::HandleMoveForward(float Value)
 {
 	if (!GetPawn()) return;
 	if (Value == 0.f) return;
-		
-	GetPawn()->AddMovementInput(FVector::ForwardVector, Value); 
+
+	if (Value == 1) dir = EDir::up;
+	else if (Value == -1) dir = EDir::down;
+	//GetPawn()->AddMovementInput(FVector::ForwardVector, Value); 
 }
 
 void ASCR_PlayerController::HandleMoveRight(float Value)
@@ -76,8 +109,10 @@ void ASCR_PlayerController::HandleMoveRight(float Value)
 	
 	if (!GetPawn()) return;
 	if (Value == 0.f) return;
-		
-	GetPawn()->AddMovementInput(FVector::RightVector, Value); 
+
+	if (Value == 1) dir = EDir::right;
+	else if (Value == -1) dir = EDir::left;
+	//GetPawn()->AddMovementInput(FVector::RightVector, Value); 
 }
 
 void ASCR_PlayerController::SendMoveForward(float Value)

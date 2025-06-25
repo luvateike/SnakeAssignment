@@ -21,6 +21,18 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int32 playerNumber;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<AActor*> Body;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FVector LastPosition;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AActor> TailBlueprint;
+
 	UPROPERTY(VisibleAnywhere)
 	UFloatingPawnMovement* MovementComponent;
 

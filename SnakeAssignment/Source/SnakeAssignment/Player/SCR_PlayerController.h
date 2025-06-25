@@ -11,6 +11,15 @@
 #include "EngineUtils.h"
 #include "SCR_PlayerController.generated.h"
 
+UENUM(BlueprintType)
+enum class EDir : uint8
+{
+	up     UMETA(DisplayName = "up"),
+	down   UMETA(DisplayName = "down"),
+	left   UMETA(DisplayName = "left"),
+	right  UMETA(DisplayName = "right")
+};
+
 UCLASS()
 class SNAKEASSIGNMENT_API ASCR_PlayerController : public APlayerController
 {
@@ -53,5 +62,7 @@ public:
 private:
 	
 	bool bHasSpawnedSecondPlayer = false;
+
+	EDir dir = EDir::up;
 
 };
