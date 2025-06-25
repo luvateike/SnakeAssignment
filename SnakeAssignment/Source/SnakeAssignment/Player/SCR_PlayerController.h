@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -13,9 +11,6 @@
 #include "EngineUtils.h"
 #include "SCR_PlayerController.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class SNAKEASSIGNMENT_API ASCR_PlayerController : public APlayerController
 {
@@ -51,10 +46,11 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ASCR_Player> YourSnakePawnClass;
+	
+	UPROPERTY(VisibleAnywhere)
+	ASCR_PlayerController* SecondPlayer;
 
 private:
-
-	ASCR_PlayerController* SecondPlayer;
 	
 	bool bHasSpawnedSecondPlayer = false;
 

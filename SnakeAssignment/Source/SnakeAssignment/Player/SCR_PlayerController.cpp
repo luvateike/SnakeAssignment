@@ -58,37 +58,36 @@ void ASCR_PlayerController::SetupInputComponent()
 
 		InputComponent->BindAction("SpawnSecondPlayer", IE_Pressed, this, &ASCR_PlayerController::TrySpawnSecondPlayer);
 		
-		//InputComponent->BindAxis("MoveForward_P2", this, &ASCR_PlayerController::SendMoveForward);
-		//InputComponent->BindAxis("MoveRight_P2", this, &ASCR_PlayerController::SendMoveRight);
+		InputComponent->BindAxis("MoveForward_P2", this, &ASCR_PlayerController::SendMoveForward);
+		InputComponent->BindAxis("MoveRight_P2", this, &ASCR_PlayerController::SendMoveRight);
 	}
 }
 
 void ASCR_PlayerController::HandleMoveForward(float Value)
 {
-	if (GetPawn())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("player %d value forward : %f"), UGameplayStatics::GetPlayerControllerID(this), Value);
-		if (Value != 0.f) { GetPawn()->AddMovementInput(FVector::ForwardVector, Value); }
-	}
+	if (!GetPawn()) return;
+	if (Value == 0.f) return;
+		
+	GetPawn()->AddMovementInput(FVector::ForwardVector, Value); 
 }
 
 void ASCR_PlayerController::HandleMoveRight(float Value)
 {
-	if (GetPawn())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("player %d value right : %f"), UGameplayStatics::GetPlayerControllerID(this),Value);
-		if (Value != 0.f) { GetPawn()->AddMovementInput(FVector::RightVector, Value); }
-	}
+	
+	if (!GetPawn()) return;
+	if (Value == 0.f) return;
+		
+	GetPawn()->AddMovementInput(FVector::RightVector, Value); 
 }
 
 void ASCR_PlayerController::SendMoveForward(float Value)
 {
-	SecondPlayer->HandleMoveForward(Value);
+	if (SecondPlayer) SecondPlayer->HandleMoveForward(Value);
 }
 
 void ASCR_PlayerController::SendMoveRight(float Value)
 {
-	SecondPlayer->HandleMoveRight(Value);
+	if (SecondPlayer) SecondPlayer->HandleMoveRight(Value);
 }
 
 
