@@ -8,7 +8,6 @@ ASCR_Player::ASCR_Player()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
-
 }
 
 void ASCR_Player::BeginPlay()

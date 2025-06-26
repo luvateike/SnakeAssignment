@@ -27,17 +27,33 @@ void USCR_CameraMovementComponent::BeginPlay()
 
 
 void USCR_CameraMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                                 FActorComponentTickFunction* ThisTickFunction)
+												 FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (CurrentPlayerActors.Num() > 0)
 	{
 		FVector MiddlePoint = GetMiddlePoint(CurrentPlayerActors);
-		FVector NewLocation = FVector(MiddlePoint.X, MiddlePoint.Y, Height);
+
+		float MaxDistance = 0.f;
+		for (int32 i = 0; i < CurrentPlayerActors.Num(); ++i)
+		{
+			for (int32 j = i + 1; j < CurrentPlayerActors.Num(); ++j)
+			{
+				if (IsValid(CurrentPlayerActors[i]) && IsValid(CurrentPlayerActors[j]))
+				{
+					float Distance = FVector::Dist(CurrentPlayerActors[i]->GetActorLocation(), CurrentPlayerActors[j]->GetActorLocation());
+					MaxDistance = FMath::Max(MaxDistance, Distance);
+				}
+			}
+		}
+
+		float DesiredHeight = FMath::Max(1500.0f, MaxDistance);
+		FVector NewLocation = FVector(MiddlePoint.X, MiddlePoint.Y, DesiredHeight);
 		GetOwner()->SetActorLocation(NewLocation);
 	}
 }
+
 
 FVector USCR_CameraMovementComponent::GetMiddlePoint(const TArray<AActor*>& PlayerActors)
 {

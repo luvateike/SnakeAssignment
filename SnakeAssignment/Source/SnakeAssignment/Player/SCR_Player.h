@@ -20,6 +20,8 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 	void SetPositions(float DeltaTime);
+
+	UFUNCTION(BlueprintCallable)
 	void AddTailSegment();
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

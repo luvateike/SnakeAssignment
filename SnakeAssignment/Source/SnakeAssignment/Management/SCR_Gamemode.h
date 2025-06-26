@@ -3,6 +3,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "../Player/SCR_PlayerController.h"
+#include "../Player/SCR_PlayerAIController.h"
+#include "../Player/SCR_Player.h"
+#include "../Objects/SCR_Apple.h"
 #include "SCR_Gamemode.generated.h"
 
 UCLASS()
@@ -12,4 +15,30 @@ class SNAKEASSIGNMENT_API ASCR_Gamemode : public AGameModeBase
 
 public:
 	ASCR_Gamemode();
+
+protected:
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ASCR_Player> AISnakeClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AController> AIControllerClass;
+
+	UPROPERTY(EditAnywhere, Category = "Apple Spawning")
+	TSubclassOf<ASCR_Apple> AppleBlueprint;
+
+	UPROPERTY(EditAnywhere, Category = "Apple Spawning")
+	float BoundX = 1000.f;
+
+	UPROPERTY(EditAnywhere, Category = "Apple Spawning")
+	float BoundY = 1000.f;
+
+	UPROPERTY(EditAnywhere, Category = "Apple Spawning")
+	float AppleSpawnInterval = 2.0f;
+
+private:
+	void SpawnApple();
+
+	FTimerHandle AppleSpawnTimerHandle;
 };
