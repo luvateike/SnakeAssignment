@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "../Player/SCR_PlayerController.h"
-#include "../Player/SCR_PlayerAIController.h"
 #include "../Player/SCR_Player.h"
 #include "../Objects/SCR_Apple.h"
 #include "SCR_Gamemode.generated.h"
@@ -19,12 +18,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<ASCR_Player> AISnakeClass;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<AController> AIControllerClass;
-
 	UPROPERTY(EditAnywhere, Category = "Apple Spawning")
 	TSubclassOf<ASCR_Apple> AppleBlueprint;
 
@@ -36,6 +29,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Apple Spawning")
 	float AppleSpawnInterval = 2.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Walls")
+	TSubclassOf<AActor> WallBlueprint;
+
+	UFUNCTION()
+	void SpawnWalls();
 
 private:
 	void SpawnApple();

@@ -43,6 +43,9 @@ void ASCR_PlayerController::Tick(float DeltaTime)
 	
 	if (!MyPawn && GetPawn()) MyPawn = GetPawn();
 
+
+	if (!GetPawn()) return;
+	
 	switch (dir)
 	{
 		case EDir::up:
@@ -76,6 +79,14 @@ ASCR_PlayerController::ASCR_PlayerController()
 	{
 		YourSnakePawnClass = SnakePawnBPClass.Class;
 	}
+
+	static ConstructorHelpers::FClassFinder<APawn> SnakeBP(TEXT("/Game/Blueprints/BP_Player"));
+	if (SnakeBP.Succeeded())
+	{
+		AISnakeClass = SnakeBP.Class;
+	}
+
+	AIControllerClass = ASCR_PlayerAIController::StaticClass();
 }
 
 void ASCR_PlayerController::SetupInputComponent()
@@ -91,6 +102,8 @@ void ASCR_PlayerController::SetupInputComponent()
 		InputComponent->BindAxis("MoveRight_P1", this, &ASCR_PlayerController::HandleMoveRight);
 
 		InputComponent->BindAction("SpawnSecondPlayer", IE_Pressed, this, &ASCR_PlayerController::TrySpawnSecondPlayer);
+		
+		InputComponent->BindAction("SpawnAIPlayer", IE_Pressed, this, &ASCR_PlayerController::TrySpawnAIPlayer);
 		
 		InputComponent->BindAxis("MoveForward_P2", this, &ASCR_PlayerController::SendMoveForward);
 		InputComponent->BindAxis("MoveRight_P2", this, &ASCR_PlayerController::SendMoveRight);
@@ -153,3 +166,23 @@ void ASCR_PlayerController::TrySpawnSecondPlayer()
 	}
 }
 
+void ASCR_PlayerController::TrySpawnAIPlayer()
+{
+	UWorld* World = GetWorld();
+	if (!World || !AISnakeClass || !AIControllerClass) return;
+
+	FVector SnakeSpawnLocation(100.f, 100.f, 100.f);
+	FRotator SpawnRotation = FRotator::ZeroRotator;
+
+	FActorSpawnParameters PawnParams;
+	PawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	ASCR_Player* AISnake = World->SpawnActor<ASCR_Player>(AISnakeClass, SnakeSpawnLocation, SpawnRotation, PawnParams);
+	if (!AISnake) return;
+
+	AController* AIController = World->SpawnActor<AController>(AIControllerClass);
+	if (AIController)
+	{
+		AIController->Possess(AISnake);
+	}
+}

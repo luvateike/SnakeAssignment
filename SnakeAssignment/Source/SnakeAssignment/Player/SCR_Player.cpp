@@ -11,7 +11,7 @@ ASCR_Player::ASCR_Player()
 
 	HeadCollision = CreateDefaultSubobject<USphereComponent>(TEXT("HeadCollision"));
 	HeadCollision->SetupAttachment(RootComponent);
-	HeadCollision->SetSphereRadius(50.0f); // tweak size as needed
+	HeadCollision->SetSphereRadius(50.0f);
 	HeadCollision->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 	HeadCollision->OnComponentBeginOverlap.AddDynamic(this, &ASCR_Player::OnHeadOverlap);
 
@@ -21,10 +21,7 @@ void ASCR_Player::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	for (int i = 0 ; i < 6; i++)
-	{
-		AddTailSegment();
-	}
+	AddTailSegment();
 }
 
 void ASCR_Player::Tick(float DeltaTime)
@@ -115,4 +112,17 @@ void ASCR_Player::OnHeadOverlap(UPrimitiveComponent* OverlappedComp, AActor* Oth
 		OtherActor->Destroy();
 		AddTailSegment();
 	}
+}
+
+void ASCR_Player::Die()
+{
+	for (ASCR_Tail* Segment : Body)
+	{
+		if (IsValid(Segment))
+		{
+			Segment->Destroy();
+		}
+	}
+	Body.Empty();
+	Destroy();
 }

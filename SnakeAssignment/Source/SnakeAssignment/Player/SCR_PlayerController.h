@@ -9,6 +9,7 @@
 #include "Engine/Engine.h"
 #include "Engine/GameViewportClient.h"
 #include "EngineUtils.h"
+#include "SCR_PlayerAIController.h"
 #include "SCR_PlayerController.generated.h"
 
 UENUM(BlueprintType)
@@ -52,12 +53,19 @@ public:
 
 	UFUNCTION()
 	void TrySpawnSecondPlayer();
+	void TrySpawnAIPlayer();
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ASCR_Player> YourSnakePawnClass;
 	
 	UPROPERTY(VisibleAnywhere)
 	ASCR_PlayerController* SecondPlayer;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ASCR_Player> AISnakeClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AController> AIControllerClass;
 
 private:
 	

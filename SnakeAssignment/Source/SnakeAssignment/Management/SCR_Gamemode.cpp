@@ -8,14 +8,6 @@ ASCR_Gamemode::ASCR_Gamemode()
 {
 	PlayerControllerClass = ASCR_PlayerController::StaticClass();
 
-	static ConstructorHelpers::FClassFinder<APawn> SnakeBP(TEXT("/Game/Blueprints/BP_Player"));
-	if (SnakeBP.Succeeded())
-	{
-		AISnakeClass = SnakeBP.Class;
-	}
-
-	AIControllerClass = ASCR_PlayerAIController::StaticClass();
-
 	static ConstructorHelpers::FClassFinder<ASCR_Apple> AppleBP(TEXT("/Game/Blueprints/BP_Apple"));
 	if (AppleBP.Succeeded())
 	{
@@ -28,27 +20,13 @@ void ASCR_Gamemode::BeginPlay()
 	Super::BeginPlay();
 
 	UWorld* World = GetWorld();
-	if (!World || !AISnakeClass || !AIControllerClass) return;
-
-	FVector SnakeSpawnLocation(100.f, 100.f, 100.f);
-	FRotator SpawnRotation = FRotator::ZeroRotator;
-
-	FActorSpawnParameters PawnParams;
-	PawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-	ASCR_Player* AISnake = World->SpawnActor<ASCR_Player>(AISnakeClass, SnakeSpawnLocation, SpawnRotation, PawnParams);
-	if (!AISnake) return;
-
-	AController* AIController = World->SpawnActor<AController>(AIControllerClass);
-	if (AIController)
-	{
-		AIController->Possess(AISnake);
-	}
 
 	if (AppleBlueprint)
 	{
 		World->GetTimerManager().SetTimer(AppleSpawnTimerHandle, this, &ASCR_Gamemode::SpawnApple, AppleSpawnInterval, true);
 	}
+
+	SpawnWalls();
 }
 
 void ASCR_Gamemode::SpawnApple()
@@ -67,4 +45,41 @@ void ASCR_Gamemode::SpawnApple()
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	World->SpawnActor<ASCR_Apple>(AppleBlueprint, SpawnLocation, SpawnRotation, Params);
+}
+
+void ASCR_Gamemode::SpawnWalls()
+{
+	UE_LOG(LogTemp, Warning, TEXT("testing 1"));
+	if (!WallBlueprint) return;
+
+	UE_LOG(LogTemp, Warning, TEXT("testing 2"));
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	FVector WallSize = FVector(100.f, BoundY * 2.f + 200.f, 500.f);
+
+	TArray<FVector> Locations = {
+		FVector(-BoundX - 100.f, 0.f, 250.f),
+		FVector(BoundX + 100.f, 0.f, 250.f),
+		FVector(0.f, -BoundY - 100.f, 250.f),
+		FVector(0.f, BoundY + 100.f, 250.f) 
+	};
+
+	TArray<FRotator> Rotations = {
+		FRotator::ZeroRotator,
+		FRotator::ZeroRotator,
+		FRotator(0.f, 90.f, 0.f),
+		FRotator(0.f, 90.f, 0.f)
+	};
+
+	UE_LOG(LogTemp, Warning, TEXT("testing 3"));
+	for (int32 i = 0; i < 4; i++)
+	{
+		FActorSpawnParameters Params;
+		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		World->SpawnActor<AActor>(WallBlueprint, Locations[i], Rotations[i], Params);
+
+		UE_LOG(LogTemp, Warning, TEXT("testing Spawned Actor"));
+	}
 }
