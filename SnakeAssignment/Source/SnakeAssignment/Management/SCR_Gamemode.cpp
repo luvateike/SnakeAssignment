@@ -54,6 +54,7 @@ void ASCR_Gamemode::SetGameState(EGameState NewState)
 	{
 	case EGameState::MainMenu:
 		UE_LOG(LogTemp, Warning, TEXT("State changed to: MainMenu"));
+		
 		if (OutroWidget) OutroWidget->RemoveFromViewport();
 		if (MainMenuDisplay)
 		{
@@ -90,8 +91,15 @@ void ASCR_Gamemode::SetGameState(EGameState NewState)
 				OutroWidget->SetText(TotalScoresText);
 			}
 		}
+		
+		GetWorldTimerManager().SetTimer(QuitGameTimerHandle, this, &ASCR_Gamemode::QuitGameAfterOutro, 5.0f, false);
 		break;
 	}
+}
+
+void ASCR_Gamemode::QuitGameAfterOutro()
+{
+	UKismetSystemLibrary::QuitGame(this, nullptr, EQuitPreference::Quit, true);
 }
 
 void ASCR_Gamemode::UpdateUI()

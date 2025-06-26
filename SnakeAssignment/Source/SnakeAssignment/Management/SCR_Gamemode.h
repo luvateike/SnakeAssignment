@@ -29,6 +29,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Game State")
 	void SetGameState(EGameState NewState);
 
+	FTimerHandle QuitGameTimerHandle;
+	UFUNCTION()
+	void QuitGameAfterOutro();
+
 protected:
 	virtual void BeginPlay() override;
 	
