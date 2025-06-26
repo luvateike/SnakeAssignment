@@ -3,6 +3,7 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "Blueprint/UserWidget.h"
+#include "SnakeAssignment/UserInterface/SCR_OutroScoreDisplay.h"
 #include "SnakeAssignment/UserInterface/SCR_ScoresDisplay.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -31,17 +32,16 @@ void ASCR_Gamemode::BeginPlay()
 	World->GetTimerManager().SetTimer(UserInterfaceTimerHandle, this, &ASCR_Gamemode::UpdateUI, UICheckInterval, true);
 
 	SpawnWalls();
-
-	if (ScoresDisplayClass)
-	{
-		ScoresDisplayWidget = Cast<USCR_ScoresDisplay>(CreateWidget<UUserWidget>(GetWorld(), ScoresDisplayClass));
-		if (ScoresDisplayWidget)
-		{
-			ScoresDisplayWidget->AddToViewport();
-		}
-	}
 	
 	SetGameState(EGameState::MainMenu);
+	if (MainMenuDisplay)
+	{
+		MainMenuWidget = CreateWidget<UUserWidget>(GetWorld(), MainMenuDisplay);
+		if (MainMenuWidget)
+		{
+			MainMenuWidget->AddToViewport();
+		}
+	}
 }
 
 void ASCR_Gamemode::SetGameState(EGameState NewState)
@@ -54,21 +54,42 @@ void ASCR_Gamemode::SetGameState(EGameState NewState)
 	{
 	case EGameState::MainMenu:
 		UE_LOG(LogTemp, Warning, TEXT("State changed to: MainMenu"));
-
-		// Show MainMenu widget (if you have one)
-		// Disable player input (can disable tick by gating like above)
+		if (OutroWidget) OutroWidget->RemoveFromViewport();
+		if (MainMenuDisplay)
+		{
+			MainMenuWidget = CreateWidget<UUserWidget>(GetWorld(), MainMenuDisplay);
+			if (MainMenuWidget)
+			{
+				MainMenuWidget->AddToViewport();
+			}
+		}
 		break;
 
 	case EGameState::Game:
 		UE_LOG(LogTemp, Warning, TEXT("State changed to: Game"));
-
-		// Everything will start running again thanks to tick/input checks
+		if (MainMenuWidget) MainMenuWidget->RemoveFromViewport();
+		if (ScoresDisplayClass)
+		{
+			ScoresDisplayWidget = Cast<USCR_ScoresDisplay>(CreateWidget<UUserWidget>(GetWorld(), ScoresDisplayClass));
+			if (ScoresDisplayWidget)
+			{
+				ScoresDisplayWidget->AddToViewport();
+			}
+		}
 		break;
 
 	case EGameState::Outro:
 		UE_LOG(LogTemp, Warning, TEXT("State changed to: Outro"));
-
-		// Hide gameplay widgets, maybe show "final score"
+		if (ScoresDisplayWidget) ScoresDisplayWidget->RemoveFromViewport();
+		if (OutroDisplay)
+		{
+			OutroWidget = Cast<USCR_OutroScoreDisplay>(CreateWidget<UUserWidget>(GetWorld(), OutroDisplay));
+			if (OutroWidget)
+			{
+				OutroWidget->AddToViewport();
+				OutroWidget->SetText(TotalScoresText);
+			}
+		}
 		break;
 	}
 }
@@ -79,6 +100,12 @@ void ASCR_Gamemode::UpdateUI()
 	
 	TArray<AActor*> PlayerActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASCR_Player::StaticClass(), PlayerActors);
+
+	if (PlayerActors.Num() == 0)
+	{
+		SetGameState(EGameState::Outro);
+		return;
+	}
 
 	FString ScoreText = "Scores:\n";
 

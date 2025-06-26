@@ -58,7 +58,17 @@ protected:
 
 	UFUNCTION()
 	void SpawnWalls();
+	
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> MainMenuDisplay;
+	UPROPERTY()
+	class UUserWidget* MainMenuWidget;
 
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> OutroDisplay;
+	UPROPERTY()
+	class USCR_OutroScoreDisplay* OutroWidget;
+	
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> ScoresDisplayClass;
 
