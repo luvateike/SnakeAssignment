@@ -10,7 +10,6 @@ ASCR_PlayerAIController::ASCR_PlayerAIController()
 void ASCR_PlayerAIController::BeginPlay()
 {
 	Super::BeginPlay();
-	ControlledSnake = Cast<ASCR_Player>(GetPawn());
 }
 
 void ASCR_PlayerAIController::Tick(float DeltaTime)
@@ -19,6 +18,7 @@ void ASCR_PlayerAIController::Tick(float DeltaTime)
 	if (!ControlledSnake)
 	{
 		ControlledSnake = Cast<ASCR_Player>(GetPawn());
+		ControlledSnake->bIsAI = true;
 		if (!ControlledSnake) return;
 	}
 	MakeDecision();
@@ -54,12 +54,6 @@ void ASCR_PlayerAIController::MakeDecision()
 
 	float DeltaX = Direction.X;
 	float DeltaY = Direction.Y;
-
-	UE_LOG(LogTemp, Warning, TEXT("AI T: X=%f, Y=%f, Z=%f"), TargetPos.X, TargetPos.Y, TargetPos.Z);
-	
-	UE_LOG(LogTemp, Warning, TEXT("AI S: X=%f, Y=%f, Z=%f"), SnakeLocation.X, SnakeLocation.Y, SnakeLocation.Z);
-	
-	UE_LOG(LogTemp, Warning, TEXT("AI D: X=%f, Y=%f, Z=%f"), Direction.X, Direction.Y, Direction.Z);
 
 	if (FMath::Abs(DeltaX) > FMath::Abs(DeltaY))
 	{

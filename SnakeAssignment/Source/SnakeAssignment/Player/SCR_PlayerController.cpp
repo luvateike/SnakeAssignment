@@ -3,8 +3,6 @@
 void ASCR_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
-	const int32 MyID = UGameplayStatics::GetPlayerControllerID(this);
 	
 	if (!GetPawn())
 	{
@@ -25,19 +23,24 @@ void ASCR_PlayerController::BeginPlay()
 			}
 		}
 	}
-
-	if (ASCR_Player* PlayerPawn = Cast<ASCR_Player>(GetPawn()))
-	{
-		if (PlayerPawn)
-		{
-			PlayerPawn->playerNumber = MyID;
-		}
-	}
 }
 
 void ASCR_PlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	const int32 MyID = UGameplayStatics::GetPlayerControllerID(this);
+
+	if (!MyPlayer)
+	{
+		MyPlayer = Cast<ASCR_Player>(GetPawn());
+		if (MyPlayer)
+		{
+			MyPlayer->playerNumber = MyID;
+		}
+	}
+	
+	
 	if (!MyPawn && GetPawn()) MyPawn = GetPawn();
 
 	switch (dir)

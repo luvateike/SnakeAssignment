@@ -4,6 +4,7 @@
 #include "SCR_Tail.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "Components/SphereComponent.h"
 #include "SCR_Player.generated.h"
 
 UCLASS()
@@ -46,6 +47,17 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	UFloatingPawnMovement* MovementComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* HeadCollision;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bIsAI = false;
+
+	UFUNCTION()
+	void OnHeadOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+					   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+					   bool bFromSweep, const FHitResult& SweepResult);
 
 private:
 	

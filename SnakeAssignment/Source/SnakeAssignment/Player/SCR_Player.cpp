@@ -1,5 +1,5 @@
 #include "SCR_Player.h"
-
+#include "../Objects/SCR_Apple.h"
 #include "ToolContextInterfaces.h"
 #include "Engine/World.h"
 
@@ -8,6 +8,13 @@ ASCR_Player::ASCR_Player()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
+
+	HeadCollision = CreateDefaultSubobject<USphereComponent>(TEXT("HeadCollision"));
+	HeadCollision->SetupAttachment(RootComponent);
+	HeadCollision->SetSphereRadius(50.0f); // tweak size as needed
+	HeadCollision->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+	HeadCollision->OnComponentBeginOverlap.AddDynamic(this, &ASCR_Player::OnHeadOverlap);
+
 }
 
 void ASCR_Player::BeginPlay()
@@ -99,3 +106,13 @@ void ASCR_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+void ASCR_Player::OnHeadOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+								UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+								bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && OtherActor->IsA<ASCR_Apple>())
+	{
+		OtherActor->Destroy();
+		AddTailSegment();
+	}
+}

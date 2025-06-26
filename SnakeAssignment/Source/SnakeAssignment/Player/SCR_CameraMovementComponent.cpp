@@ -43,12 +43,12 @@ void USCR_CameraMovementComponent::TickComponent(float DeltaTime, ELevelTick Tic
 				if (IsValid(CurrentPlayerActors[i]) && IsValid(CurrentPlayerActors[j]))
 				{
 					float Distance = FVector::Dist(CurrentPlayerActors[i]->GetActorLocation(), CurrentPlayerActors[j]->GetActorLocation());
-					MaxDistance = FMath::Max(MaxDistance, Distance);
+					MaxDistance = FMath::Max(MaxDistance, Distance+1000);
 				}
 			}
 		}
 
-		float DesiredHeight = FMath::Max(1500.0f, MaxDistance);
+		float DesiredHeight = FMath::Max(2000.0f, MaxDistance);
 		FVector NewLocation = FVector(MiddlePoint.X, MiddlePoint.Y, DesiredHeight);
 		GetOwner()->SetActorLocation(NewLocation);
 	}

@@ -65,4 +65,6 @@ private:
 
 	EDir dir = EDir::up;
 
+	ASCR_Player* MyPlayer;
+
 };
