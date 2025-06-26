@@ -2,6 +2,7 @@
 #include "../Objects/SCR_Apple.h"
 #include "ToolContextInterfaces.h"
 #include "Engine/World.h"
+#include "SnakeAssignment/Management/SCR_Gamemode.h"
 
 ASCR_Player::ASCR_Player()
 {
@@ -27,6 +28,10 @@ void ASCR_Player::BeginPlay()
 void ASCR_Player::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	ASCR_Gamemode* GM = Cast<ASCR_Gamemode>(UGameplayStatics::GetGameMode(this));
+	if (!GM || GM->CurrentGameState != EGameState::Game) return;
+
 
 	SetPositions(DeltaTime);
 

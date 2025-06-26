@@ -7,6 +7,14 @@
 #include "../Objects/SCR_Apple.h"
 #include "SCR_Gamemode.generated.h"
 
+UENUM(BlueprintType)
+enum class EGameState : uint8
+{
+	MainMenu,
+	Game,
+	Outro
+};
+
 UCLASS()
 class SNAKEASSIGNMENT_API ASCR_Gamemode : public AGameModeBase
 {
@@ -14,10 +22,16 @@ class SNAKEASSIGNMENT_API ASCR_Gamemode : public AGameModeBase
 
 public:
 	ASCR_Gamemode();
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Game State")
+	EGameState CurrentGameState;
+
+	UFUNCTION(BlueprintCallable, Category = "Game State")
+	void SetGameState(EGameState NewState);
 
 protected:
 	virtual void BeginPlay() override;
-
+	
 	UFUNCTION()
 	void UpdateUI();
 

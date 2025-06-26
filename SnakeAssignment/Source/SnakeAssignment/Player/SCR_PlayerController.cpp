@@ -1,5 +1,7 @@
 #include "SCR_PlayerController.h"
 
+#include "SnakeAssignment/Management/SCR_Gamemode.h"
+
 void ASCR_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -28,6 +30,9 @@ void ASCR_PlayerController::BeginPlay()
 void ASCR_PlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (GetWorld()->GetAuthGameMode<ASCR_Gamemode>()->CurrentGameState != EGameState::Game)
+		return;
 
 	const int32 MyID = UGameplayStatics::GetPlayerControllerID(this);
 
@@ -98,6 +103,8 @@ void ASCR_PlayerController::SetupInputComponent()
 	const int32 PlayerID = UGameplayStatics::GetPlayerControllerID(this);
 	if (PlayerID == 0)
 	{
+		InputComponent->BindAction("ChangeState", IE_Pressed, this, &ASCR_PlayerController::ChangeState);
+		
 		InputComponent->BindAxis("MoveForward_P1", this, &ASCR_PlayerController::HandleMoveForward);
 		InputComponent->BindAxis("MoveRight_P1", this, &ASCR_PlayerController::HandleMoveRight);
 
@@ -110,8 +117,38 @@ void ASCR_PlayerController::SetupInputComponent()
 	}
 }
 
+void ASCR_PlayerController::ChangeState()
+{
+	ASCR_Gamemode* GM = Cast<ASCR_Gamemode>(UGameplayStatics::GetGameMode(this));
+	if (!GM) return;
+
+	EGameState Current = GM->CurrentGameState;
+	EGameState Next;
+
+	switch (Current)
+	{
+	case EGameState::MainMenu:
+		Next = EGameState::Game;
+		break;
+
+	case EGameState::Game:
+		Next = EGameState::Outro;
+		break;
+
+	case EGameState::Outro:
+	default:
+		Next = EGameState::MainMenu;
+		break;
+	}
+
+	GM->SetGameState(Next);
+}
+
 void ASCR_PlayerController::HandleMoveForward(float Value)
 {
+	ASCR_Gamemode* GM = Cast<ASCR_Gamemode>(UGameplayStatics::GetGameMode(this));
+	if (!GM || GM->CurrentGameState != EGameState::Game) return;
+	
 	if (!GetPawn()) return;
 	if (Value == 0.f) return;
 
@@ -121,6 +158,8 @@ void ASCR_PlayerController::HandleMoveForward(float Value)
 
 void ASCR_PlayerController::HandleMoveRight(float Value)
 {
+	ASCR_Gamemode* GM = Cast<ASCR_Gamemode>(UGameplayStatics::GetGameMode(this));
+	if (!GM || GM->CurrentGameState != EGameState::Game) return;
 	
 	if (!GetPawn()) return;
 	if (Value == 0.f) return;
@@ -142,6 +181,9 @@ void ASCR_PlayerController::SendMoveRight(float Value)
 
 void ASCR_PlayerController::TrySpawnSecondPlayer()
 {
+	ASCR_Gamemode* GM = Cast<ASCR_Gamemode>(UGameplayStatics::GetGameMode(this));
+	if (!GM || GM->CurrentGameState != EGameState::Game) return;
+	
 	if (bHasSpawnedSecondPlayer) return;
 	UWorld* World = GetWorld();
 	if (!World) return;
@@ -168,6 +210,9 @@ void ASCR_PlayerController::TrySpawnSecondPlayer()
 
 void ASCR_PlayerController::TrySpawnAIPlayer()
 {
+	ASCR_Gamemode* GM = Cast<ASCR_Gamemode>(UGameplayStatics::GetGameMode(this));
+	if (!GM || GM->CurrentGameState != EGameState::Game) return;
+	
 	UWorld* World = GetWorld();
 	if (!World || !AISnakeClass || !AIControllerClass) return;
 

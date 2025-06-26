@@ -38,13 +38,45 @@ void ASCR_Gamemode::BeginPlay()
 		if (ScoresDisplayWidget)
 		{
 			ScoresDisplayWidget->AddToViewport();
-			ScoresDisplayWidget->SetText("Game Started");
 		}
+	}
+	
+	SetGameState(EGameState::MainMenu);
+}
+
+void ASCR_Gamemode::SetGameState(EGameState NewState)
+{
+	if (CurrentGameState == NewState) return;
+
+	CurrentGameState = NewState;
+
+	switch (CurrentGameState)
+	{
+	case EGameState::MainMenu:
+		UE_LOG(LogTemp, Warning, TEXT("State changed to: MainMenu"));
+
+		// Show MainMenu widget (if you have one)
+		// Disable player input (can disable tick by gating like above)
+		break;
+
+	case EGameState::Game:
+		UE_LOG(LogTemp, Warning, TEXT("State changed to: Game"));
+
+		// Everything will start running again thanks to tick/input checks
+		break;
+
+	case EGameState::Outro:
+		UE_LOG(LogTemp, Warning, TEXT("State changed to: Outro"));
+
+		// Hide gameplay widgets, maybe show "final score"
+		break;
 	}
 }
 
 void ASCR_Gamemode::UpdateUI()
 {
+	if (CurrentGameState != EGameState::Game) return;
+	
 	TArray<AActor*> PlayerActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASCR_Player::StaticClass(), PlayerActors);
 
@@ -83,6 +115,8 @@ void ASCR_Gamemode::GetLastScore(AActor* DeadPlayer)
 
 void ASCR_Gamemode::SpawnApple()
 {
+	if (CurrentGameState != EGameState::Game) return;
+
 	if (!AppleBlueprint) return;
 
 	UWorld* World = GetWorld();

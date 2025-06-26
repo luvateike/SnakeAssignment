@@ -37,7 +37,11 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	APawn* MyPawn;
 
+	UFUNCTION()
 	virtual void SetupInputComponent() override;
+
+	UFUNCTION()
+	void ChangeState();
 
 	UFUNCTION()
 	void HandleMoveForward(float Value);

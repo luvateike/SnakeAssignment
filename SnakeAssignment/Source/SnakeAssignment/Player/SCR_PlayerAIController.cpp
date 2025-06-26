@@ -1,6 +1,7 @@
 #include "SCR_PlayerAIController.h"
 #include "../Objects/SCR_Apple.h"
 #include "Kismet/GameplayStatics.h"
+#include "SnakeAssignment/Management/SCR_Gamemode.h"
 
 ASCR_PlayerAIController::ASCR_PlayerAIController()
 {
@@ -15,6 +16,10 @@ void ASCR_PlayerAIController::BeginPlay()
 void ASCR_PlayerAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	ASCR_Gamemode* GM = Cast<ASCR_Gamemode>(UGameplayStatics::GetGameMode(this));
+	if (!GM || GM->CurrentGameState != EGameState::Game) return;
+	
 	if (!ControlledSnake)
 	{
 		ControlledSnake = Cast<ASCR_Player>(GetPawn());
@@ -33,7 +38,6 @@ void ASCR_PlayerAIController::MakeDecision()
 	
 	if (!ClosestApple || !IsValid(ClosestApple))
 	{
-		UE_LOG(LogTemp,Warning,TEXT("Getting closest apple"));
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASCR_Apple::StaticClass(), Apples);
 		if (Apples.Num() == 0) return;
 

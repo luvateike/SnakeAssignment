@@ -2,6 +2,7 @@
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "SCR_Player.h"
+#include "SnakeAssignment/Management/SCR_Gamemode.h"
 
 
 USCR_CameraMovementComponent::USCR_CameraMovementComponent()
@@ -30,6 +31,9 @@ void USCR_CameraMovementComponent::TickComponent(float DeltaTime, ELevelTick Tic
 												 FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	ASCR_Gamemode* GM = Cast<ASCR_Gamemode>(UGameplayStatics::GetGameMode(this));
+	if (!GM || GM->CurrentGameState != EGameState::Game) return;
 
 	if (CurrentPlayerActors.Num() > 0)
 	{
