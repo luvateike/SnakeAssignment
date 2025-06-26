@@ -10,7 +10,6 @@ USCR_CameraMovementComponent::USCR_CameraMovementComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-
 void USCR_CameraMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -21,7 +20,7 @@ void USCR_CameraMovementComponent::BeginPlay()
 		   PlayerSearchTimerHandle,
 		   this,
 		   &USCR_CameraMovementComponent::RefreshPlayerList,
-		   3.0f,
+		   1.0f,
 		   true
 	   );
 }

@@ -215,6 +215,17 @@ void ASCR_Gamemode::AdvanceLevel()
 {
 	CurrentLevel++;
 
+	TArray<AActor*> TailActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASCR_Tail::StaticClass(), TailActors);
+
+	for (AActor* Tail : TailActors)
+	{
+		if (IsValid(Tail))
+		{
+			Tail->Destroy();
+		}
+	}
+
 	if (CurrentLevel >= MaxLevels)
 	{
 		SetGameState(EGameState::Outro);
