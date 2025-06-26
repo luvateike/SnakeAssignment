@@ -117,7 +117,7 @@ void ASCR_Player::OnHeadOverlap(UPrimitiveComponent* OverlappedComp, AActor* Oth
 
 void ASCR_Player::Die()
 {
-	OnDeath.Broadcast();
+	OnDeath.Broadcast(this);
 	
 	for (ASCR_Tail* Segment : Body)
 	{

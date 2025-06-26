@@ -2,6 +2,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "Blueprint/UserWidget.h"
+#include "SnakeAssignment/UserInterface/SCR_ScoresDisplay.h"
 #include "UObject/ConstructorHelpers.h"
 
 ASCR_Gamemode::ASCR_Gamemode()
@@ -26,7 +28,57 @@ void ASCR_Gamemode::BeginPlay()
 		World->GetTimerManager().SetTimer(AppleSpawnTimerHandle, this, &ASCR_Gamemode::SpawnApple, AppleSpawnInterval, true);
 	}
 
+	World->GetTimerManager().SetTimer(UserInterfaceTimerHandle, this, &ASCR_Gamemode::UpdateUI, UICheckInterval, true);
+
 	SpawnWalls();
+
+	if (ScoresDisplayClass)
+	{
+		ScoresDisplayWidget = Cast<USCR_ScoresDisplay>(CreateWidget<UUserWidget>(GetWorld(), ScoresDisplayClass));
+		if (ScoresDisplayWidget)
+		{
+			ScoresDisplayWidget->AddToViewport();
+			ScoresDisplayWidget->SetText("Game Started");
+		}
+	}
+}
+
+void ASCR_Gamemode::UpdateUI()
+{
+	TArray<AActor*> PlayerActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASCR_Player::StaticClass(), PlayerActors);
+
+	FString ScoreText = "Scores:\n";
+
+	for (AActor* Actor : PlayerActors)
+	{
+		ASCR_Player* Player = Cast<ASCR_Player>(Actor);
+		if (Player)
+		{
+			FString PlayerLabel = Player->bIsAI ? "AI" : "Player";
+			ScoreText += FString::Printf(TEXT("%s %d: %d\n"), *PlayerLabel, Player->playerNumber, Player->Body.Num());
+			if (!RegisteredPlayerScores.Contains(Player))
+			{
+				Player->OnDeath.AddDynamic(this, &ASCR_Gamemode::GetLastScore);
+				RegisteredPlayerScores.Add(Player);
+			}
+		}
+	}
+
+	if (ScoresDisplayWidget)
+	{
+		ScoresDisplayWidget->SetText(ScoreText);
+	}
+}
+
+void ASCR_Gamemode::GetLastScore(AActor* DeadPlayer)
+{
+	ASCR_Player* Player = Cast<ASCR_Player>(DeadPlayer);
+	if (Player)
+	{
+		FString PlayerLabel = Player->bIsAI ? "AI" : "Player";
+		TotalScoresText += FString::Printf(TEXT("%s %d: %d\n"), *PlayerLabel, Player->playerNumber, Player->Body.Num());
+	}
 }
 
 void ASCR_Gamemode::SpawnApple()

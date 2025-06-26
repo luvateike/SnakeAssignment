@@ -83,7 +83,7 @@ void ASCR_PlayerAIController::MakeDecision()
 	}
 }
 
-void ASCR_PlayerAIController::UnTargetClosestApple()
+void ASCR_PlayerAIController::UnTargetClosestApple(AActor* DeadPlayer)
 {
 	if (ASCR_Apple* AppleClass = Cast<ASCR_Apple>(ClosestApple)) AppleClass->BeingTargetedBy = nullptr;
 }

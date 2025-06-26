@@ -18,6 +18,12 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void UpdateUI();
+
+	UFUNCTION()
+	void GetLastScore(AActor* DeadPlayer);
+
 	UPROPERTY(EditAnywhere, Category = "Apple Spawning")
 	TSubclassOf<ASCR_Apple> AppleBlueprint;
 
@@ -30,14 +36,30 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Apple Spawning")
 	float AppleSpawnInterval = 2.0f;
 
+	UPROPERTY(EditAnywhere, Category = "UI")
+	float UICheckInterval = 2.0f;
+
 	UPROPERTY(EditAnywhere, Category = "Walls")
 	TSubclassOf<AActor> WallBlueprint;
 
 	UFUNCTION()
 	void SpawnWalls();
 
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> ScoresDisplayClass;
+
+	UPROPERTY()
+	class USCR_ScoresDisplay* ScoresDisplayWidget;
+
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	FString TotalScoresText = "Scores:\n";
+
+	TArray<AActor*> RegisteredPlayerScores;
+
 private:
 	void SpawnApple();
 
 	FTimerHandle AppleSpawnTimerHandle;
+	
+	FTimerHandle UserInterfaceTimerHandle;
 };

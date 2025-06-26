@@ -63,7 +63,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Die();
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerDeath);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerDeath, AActor*, DeadPlayer);
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnPlayerDeath OnDeath;

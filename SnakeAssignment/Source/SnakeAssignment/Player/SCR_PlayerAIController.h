@@ -26,7 +26,7 @@ private:
 	FVector TargetPos;
 
 	void MakeDecision();
-	void UnTargetClosestApple();
+	void UnTargetClosestApple(AActor* DeadPlayer);
 
 	AActor* ClosestApple = nullptr;
 };
