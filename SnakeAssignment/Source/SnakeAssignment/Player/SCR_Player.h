@@ -4,6 +4,7 @@
 #include "SCR_Tail.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "Delegates/DelegateCombinations.h"
 #include "Components/SphereComponent.h"
 #include "SCR_Player.generated.h"
 
@@ -62,6 +63,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Die();
 
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerDeath);
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnPlayerDeath OnDeath;
 
 private:
 	

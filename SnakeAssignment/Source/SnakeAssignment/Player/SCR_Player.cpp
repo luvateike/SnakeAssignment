@@ -93,6 +93,7 @@ void ASCR_Player::AddTailSegment()
 	ASCR_Tail* NewTail = World->SpawnActor<ASCR_Tail>(TailBlueprint, SpawnLocation, FRotator::ZeroRotator, SpawnParams);
 	if (NewTail)
 	{
+		NewTail->PlayerOwner = this;
 		NewTail->SetActorLocation(SpawnLocation);
 		Body.Add(NewTail);
 	}
@@ -116,6 +117,8 @@ void ASCR_Player::OnHeadOverlap(UPrimitiveComponent* OverlappedComp, AActor* Oth
 
 void ASCR_Player::Die()
 {
+	OnDeath.Broadcast();
+	
 	for (ASCR_Tail* Segment : Body)
 	{
 		if (IsValid(Segment))

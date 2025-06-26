@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/SphereComponent.h"
+#include "../Player/SCR_Player.h"
 #include "SCR_Apple.generated.h"
 
 UCLASS()
@@ -21,4 +22,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* CollisionSphere;
+
+	UPROPERTY(VisibleAnywhere)
+	ASCR_Player* BeingTargetedBy = nullptr;
 };

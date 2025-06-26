@@ -19,5 +19,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	AActor* PlayerOwner;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FVector lastPosition;
 };

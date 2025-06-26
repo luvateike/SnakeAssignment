@@ -49,20 +49,18 @@ void ASCR_Gamemode::SpawnApple()
 
 void ASCR_Gamemode::SpawnWalls()
 {
-	UE_LOG(LogTemp, Warning, TEXT("testing 1"));
 	if (!WallBlueprint) return;
 
-	UE_LOG(LogTemp, Warning, TEXT("testing 2"));
 	UWorld* World = GetWorld();
 	if (!World) return;
 
 	FVector WallSize = FVector(100.f, BoundY * 2.f + 200.f, 500.f);
 
 	TArray<FVector> Locations = {
-		FVector(-BoundX - 100.f, 0.f, 250.f),
-		FVector(BoundX + 100.f, 0.f, 250.f),
-		FVector(0.f, -BoundY - 100.f, 250.f),
-		FVector(0.f, BoundY + 100.f, 250.f) 
+		FVector(-BoundX - 200.f, 0.f, 0),
+		FVector(BoundX + 200.f, 0.f, 0.f),
+		FVector(0.f, -BoundY - 200.f, 0),
+		FVector(0.f, BoundY + 200.f, 0) 
 	};
 
 	TArray<FRotator> Rotations = {
@@ -72,14 +70,11 @@ void ASCR_Gamemode::SpawnWalls()
 		FRotator(0.f, 90.f, 0.f)
 	};
 
-	UE_LOG(LogTemp, Warning, TEXT("testing 3"));
 	for (int32 i = 0; i < 4; i++)
 	{
 		FActorSpawnParameters Params;
 		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 		World->SpawnActor<AActor>(WallBlueprint, Locations[i], Rotations[i], Params);
-
-		UE_LOG(LogTemp, Warning, TEXT("testing Spawned Actor"));
 	}
 }

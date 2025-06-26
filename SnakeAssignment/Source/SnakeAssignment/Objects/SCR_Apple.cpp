@@ -9,7 +9,6 @@ ASCR_Apple::ASCR_Apple()
 	RootComponent = CollisionSphere;
 	CollisionSphere->SetSphereRadius(50.0f);
 	CollisionSphere->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-
 }
 
 void ASCR_Apple::BeginPlay()
