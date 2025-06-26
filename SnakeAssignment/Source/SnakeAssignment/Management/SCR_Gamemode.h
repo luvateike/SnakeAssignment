@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "GameFramework/PlayerController.h"
 #include "../Player/SCR_PlayerController.h"
 #include "../Player/SCR_Player.h"
 #include "../Objects/SCR_Apple.h"
@@ -33,6 +34,18 @@ public:
 	UFUNCTION()
 	void QuitGameAfterOutro();
 
+	int32 CurrentLevel = 0;
+	const int32 MaxLevels = 3;
+
+	UPROPERTY(EditAnywhere, Category = "Level Settings")
+	TArray<float> LevelAppleSpawnIntervals;
+
+	UPROPERTY(EditAnywhere, Category = "Level Settings")
+	TArray<float> LevelBoundsX;
+
+	UPROPERTY(EditAnywhere, Category = "Level Settings")
+	TArray<float> LevelBoundsY;
+
 protected:
 	virtual void BeginPlay() override;
 	
@@ -62,7 +75,8 @@ protected:
 
 	UFUNCTION()
 	void SpawnWalls();
-	
+	void AdvanceLevel();
+
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> MainMenuDisplay;
 	UPROPERTY()
@@ -90,4 +104,7 @@ private:
 	FTimerHandle AppleSpawnTimerHandle;
 	
 	FTimerHandle UserInterfaceTimerHandle;
+
+	UPROPERTY()
+	TArray<AActor*> Walls;
 };

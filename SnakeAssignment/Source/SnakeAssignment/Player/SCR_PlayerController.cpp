@@ -178,29 +178,32 @@ void ASCR_PlayerController::SendMoveRight(float Value)
 	if (SecondPlayer) SecondPlayer->HandleMoveRight(Value);
 }
 
-
 void ASCR_PlayerController::TrySpawnSecondPlayer()
 {
 	ASCR_Gamemode* GM = Cast<ASCR_Gamemode>(UGameplayStatics::GetGameMode(this));
 	if (!GM || GM->CurrentGameState != EGameState::Game) return;
-	
 	if (bHasSpawnedSecondPlayer) return;
+
 	UWorld* World = GetWorld();
 	if (!World) return;
 
 	if (UGameplayStatics::GetPlayerControllerID(this) == 0)
 	{
-		if (UGameplayStatics::GetPlayerController(World, 1) == nullptr)
+		APlayerController* ExistingPC = UGameplayStatics::GetPlayerController(World, 1);
+
+		if (!ExistingPC || !ExistingPC->GetPawn())
 		{
 			FVector SnakeSpawnLocation = FVector(300.f, 0.f, 100.f);
-			
 			FActorSpawnParameters SpawnParams;
-			
-			World->SpawnActor<APawn>(YourSnakePawnClass, SnakeSpawnLocation, FRotator::ZeroRotator, SpawnParams);
 
-			APlayerController* NewPC = UGameplayStatics::CreatePlayer(World, 1, true);
-			if (NewPC)
+			APawn* SpawnedPawn = World->SpawnActor<APawn>(YourSnakePawnClass, SnakeSpawnLocation, FRotator::ZeroRotator, SpawnParams);
+			APlayerController* NewPC = ExistingPC ? ExistingPC : UGameplayStatics::CreatePlayer(World, 1, true);
+
+			if (NewPC && SpawnedPawn)
 			{
+				NewPC->Possess(SpawnedPawn);
+				ASCR_Player* NewPlayer = Cast<ASCR_Player>(SpawnedPawn);
+				if (NewPlayer) NewPlayer->playerNumber = 1;
 				bHasSpawnedSecondPlayer = true;
 				SecondPlayer = Cast<ASCR_PlayerController>(NewPC);
 			}
@@ -230,4 +233,9 @@ void ASCR_PlayerController::TrySpawnAIPlayer()
 	{
 		AIController->Possess(AISnake);
 	}
+}
+
+void ASCR_PlayerController::ResetSecondPlayerSpawnFlag()
+{
+	bHasSpawnedSecondPlayer = false;
 }

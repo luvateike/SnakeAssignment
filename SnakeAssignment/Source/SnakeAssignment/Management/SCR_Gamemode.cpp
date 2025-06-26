@@ -16,6 +16,10 @@ ASCR_Gamemode::ASCR_Gamemode()
 	{
 		AppleBlueprint = AppleBP.Class;
 	}
+
+	LevelAppleSpawnIntervals = { 1.0f, .5f, .2f };
+	LevelBoundsX = { 3000.f, 1500.f, 750.f };
+	LevelBoundsY = { 3000.f, 1500.f, 750.f };
 }
 
 void ASCR_Gamemode::BeginPlay()
@@ -105,17 +109,12 @@ void ASCR_Gamemode::QuitGameAfterOutro()
 void ASCR_Gamemode::UpdateUI()
 {
 	if (CurrentGameState != EGameState::Game) return;
-	
+
 	TArray<AActor*> PlayerActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASCR_Player::StaticClass(), PlayerActors);
 
-	if (PlayerActors.Num() == 0)
-	{
-		SetGameState(EGameState::Outro);
-		return;
-	}
-
 	FString ScoreText = "Scores:\n";
+	bool AllPlayersDead = true;
 
 	for (AActor* Actor : PlayerActors)
 	{
@@ -124,10 +123,16 @@ void ASCR_Gamemode::UpdateUI()
 		{
 			FString PlayerLabel = Player->bIsAI ? "AI" : "Player";
 			ScoreText += FString::Printf(TEXT("%s %d: %d\n"), *PlayerLabel, Player->playerNumber, Player->Body.Num());
+
 			if (!RegisteredPlayerScores.Contains(Player))
 			{
 				Player->OnDeath.AddDynamic(this, &ASCR_Gamemode::GetLastScore);
 				RegisteredPlayerScores.Add(Player);
+			}
+
+			if (IsValid(Player) && !Player->IsActorBeingDestroyed())
+			{
+				AllPlayersDead = false;
 			}
 		}
 	}
@@ -135,6 +140,11 @@ void ASCR_Gamemode::UpdateUI()
 	if (ScoresDisplayWidget)
 	{
 		ScoresDisplayWidget->SetText(ScoreText);
+	}
+
+	if (AllPlayersDead)
+	{
+		AdvanceLevel();
 	}
 }
 
@@ -196,6 +206,86 @@ void ASCR_Gamemode::SpawnWalls()
 		FActorSpawnParameters Params;
 		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		World->SpawnActor<AActor>(WallBlueprint, Locations[i], Rotations[i], Params);
+		AActor* wall = World->SpawnActor<AActor>(WallBlueprint, Locations[i], Rotations[i], Params);
+		Walls.Add(wall);
 	}
 }
+
+void ASCR_Gamemode::AdvanceLevel()
+{
+	CurrentLevel++;
+
+	if (CurrentLevel >= MaxLevels)
+	{
+		SetGameState(EGameState::Outro);
+		return;
+	}
+
+	BoundX = LevelBoundsX[CurrentLevel];
+	BoundY = LevelBoundsY[CurrentLevel];
+
+	if (Walls.Num() == 4)
+	{
+		Walls[0]->SetActorLocation(FVector(-BoundX - 200.f, 0.f, 0.f));
+		Walls[1]->SetActorLocation(FVector(BoundX + 200.f, 0.f, 0.f));
+		Walls[2]->SetActorLocation(FVector(0.f, -BoundY - 200.f, 0.f));
+		Walls[3]->SetActorLocation(FVector(0.f, BoundY + 200.f, 0.f));
+	}
+
+	AppleSpawnInterval = LevelAppleSpawnIntervals[CurrentLevel];
+
+	TArray<AActor*> ExistingApples;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASCR_Apple::StaticClass(), ExistingApples);
+	for (AActor* Apple : ExistingApples)
+	{
+		if (IsValid(Apple))
+		{
+			Apple->Destroy();
+		}
+	}
+
+	GetWorldTimerManager().ClearTimer(AppleSpawnTimerHandle);
+	GetWorldTimerManager().SetTimer(AppleSpawnTimerHandle, this, &ASCR_Gamemode::SpawnApple, AppleSpawnInterval, true);
+
+	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+	ASCR_PlayerController* SCR_PC = nullptr;
+	ASCR_Player* NewPawn = nullptr;
+
+	if (PC)
+	{
+		SCR_PC = Cast<ASCR_PlayerController>(PC);
+		if (SCR_PC && SCR_PC->YourSnakePawnClass)
+		{
+			APawn* OldPawn = PC->GetPawn();
+			if (OldPawn)
+			{
+				OldPawn->Destroy();
+			}
+
+			FVector SpawnLocation(0.f, 0.f, 600.f);
+			FRotator SpawnRotation = FRotator::ZeroRotator;
+
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			NewPawn = GetWorld()->SpawnActor<ASCR_Player>(
+				SCR_PC->YourSnakePawnClass,
+				SpawnLocation,
+				SpawnRotation,
+				SpawnParams
+			);
+
+			if (NewPawn)
+			{
+				NewPawn->SetActorLocation(FVector(0.f, 0.f, 100.f));
+				PC->Possess(NewPawn);
+			}
+		}
+	}
+
+	if (SCR_PC)
+	{
+		SCR_PC->ResetSecondPlayerSpawnFlag();
+	}
+}
+

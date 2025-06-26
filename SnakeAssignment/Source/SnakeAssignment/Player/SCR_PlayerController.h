@@ -71,6 +71,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AController> AIControllerClass;
 
+	UFUNCTION()
+	void ResetSecondPlayerSpawnFlag();
+
+
 private:
 	
 	bool bHasSpawnedSecondPlayer = false;
