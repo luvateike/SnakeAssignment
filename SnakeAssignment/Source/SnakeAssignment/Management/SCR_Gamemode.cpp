@@ -18,8 +18,8 @@ ASCR_Gamemode::ASCR_Gamemode()
 	}
 
 	LevelAppleSpawnIntervals = { 1.0f, .5f, .2f };
-	LevelBoundsX = { 3000.f, 1500.f, 750.f };
-	LevelBoundsY = { 3000.f, 1500.f, 750.f };
+	LevelBoundsX = { 4000.f, 2000.f, 1000.f };
+	LevelBoundsY = { 4000.f, 2000.f, 1000.f };
 }
 
 void ASCR_Gamemode::BeginPlay()
