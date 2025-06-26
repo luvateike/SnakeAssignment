@@ -49,8 +49,11 @@ void USCR_CameraMovementComponent::TickComponent(float DeltaTime, ELevelTick Tic
 		}
 
 		float DesiredHeight = FMath::Max(2000.0f, MaxDistance);
-		FVector NewLocation = FVector(MiddlePoint.X, MiddlePoint.Y, DesiredHeight);
-		GetOwner()->SetActorLocation(NewLocation);
+		FVector CurrentLocation = GetOwner()->GetActorLocation();
+		FVector TargetLocation = FVector(MiddlePoint.X, MiddlePoint.Y, DesiredHeight);
+		float InterpSpeed = 2.5f; 
+		FVector SmoothedLocation = FMath::VInterpTo(CurrentLocation, TargetLocation, DeltaTime, InterpSpeed);
+		GetOwner()->SetActorLocation(SmoothedLocation);
 	}
 }
 
